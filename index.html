@@ -1,261 +1,215 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Chmod Calculator - Linux File Permission Calculator</title>
-<meta name="description" content="Visual chmod calculator. Convert between numeric and symbolic Linux file permissions.">
+<title>Unix Chmod Calculator</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0f1117;--card:#1a1d27;--border:#2a2d3a;--text:#e4e4e7;--muted:#9ca3af;--accent:#6366f1;--ah:#818cf8;--green:#22c55e;--yellow:#eab308;--r:12px}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
-.container{max-width:900px;margin:0 auto;padding:20px}
-header{text-align:center;padding:40px 0 30px}
-h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-header p{color:var(--muted);margin-top:8px}
+:root{--bg:#1a1a2e;--card:#16213e;--accent:#0f3460;--hi:#e94560;--text:#eee;--dim:#8892b0;--border:#233554;--ok:#64ffda;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px;line-height:1.6}
+.ctn{max-width:720px;margin:0 auto}
+h1{text-align:center;font-size:1.8rem;margin-bottom:6px;background:linear-gradient(135deg,var(--hi),#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{text-align:center;color:var(--dim);font-size:.9rem;margin-bottom:28px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px}
-.card h2{font-size:1.1rem;margin-bottom:16px;color:var(--ah)}
-table.m{width:100%;border-collapse:collapse}
-table.m th,table.m td{padding:12px;text-align:center}
-table.m th{color:var(--muted);font-weight:600;font-size:.85rem;text-transform:uppercase;border-bottom:1px solid var(--border)}
-table.m td:first-child{text-align:left;font-weight:600}
-table.m tr:not(:last-child) td{border-bottom:1px solid var(--border)}
-input[type=checkbox]{appearance:none;-webkit-appearance:none;width:24px;height:24px;border:2px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;position:relative;transition:all .2s;vertical-align:middle}
-input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
-input[type=checkbox]:checked::after{content:'\2713';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:14px;font-weight:700}
-input[type=checkbox]:hover{border-color:var(--accent)}
-.og{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
-.ob{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
-.ob label{display:block;font-size:.8rem;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
-.ob .v{font-size:1.5rem;font-weight:700;font-family:'SF Mono',Monaco,Consolas,monospace;color:var(--green)}
-.cmd{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap}
-.cmd code{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:1rem;color:var(--yellow);flex:1}
-.cmd input{background:transparent;border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:.9rem;width:120px}
-.btn{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;transition:background .2s}
-.btn:hover{background:var(--ah)}
-.presets{display:flex;flex-wrap:wrap;gap:10px}
-.pb{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 18px;border-radius:8px;cursor:pointer;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.9rem;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:2px}
-.pb:hover{border-color:var(--accent);background:rgba(99,102,241,.1)}
-.pb.active{border-color:var(--accent);background:rgba(99,102,241,.15)}
-.pb small{font-family:inherit;font-size:.7rem;color:var(--muted)}
-.ni{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-.ni label{font-weight:600;color:var(--muted);font-size:.85rem;text-transform:uppercase}
-.ni input{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--green);font-family:'SF Mono',Monaco,Consolas,monospace;font-size:1.2rem;width:90px;text-align:center}
-.ni input:focus{outline:none;border-color:var(--accent)}
-table.r{width:100%;border-collapse:collapse}
-table.r th,table.r td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
-table.r th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
-table.r code{background:rgba(99,102,241,.15);color:var(--ah);padding:2px 6px;border-radius:4px;font-size:.85rem}
-footer{text-align:center;padding:30px 0;color:var(--muted);font-size:.8rem}
-@media(max-width:600px){.og{grid-template-columns:1fr}.ni{flex-direction:column;align-items:flex-start}}
+.ct{font-size:1.05rem;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.ct em{font-size:1.2rem;font-style:normal}
+.pg{display:grid;grid-template-columns:80px repeat(3,1fr);gap:0;margin-bottom:4px}
+.ph{font-size:.75rem;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;padding:8px 0;text-align:center;font-weight:600}
+.pl{display:flex;align-items:center;font-weight:500;font-size:.9rem;padding:10px 0}
+.pc{display:flex;justify-content:center;align-items:center;padding:10px 0}
+.cw{position:relative;width:44px;height:44px;cursor:pointer}
+.cw input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;z-index:2}
+.cb{width:44px;height:44px;border:2px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;transition:all .2s;background:rgba(255,255,255,.03)}
+.cw input:checked+.cb{border-color:var(--hi);background:rgba(233,69,96,.15);color:var(--hi)}
+.cw:hover .cb{border-color:var(--hi);transform:scale(1.05)}
+.ir{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap}
+.ig{flex:1;min-width:140px}
+.ig label{display:block;font-size:.78rem;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.ig input{width:100%;padding:12px 14px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:1rem;font-family:monospace;transition:border-color .2s}
+.ig input:focus{outline:none;border-color:var(--hi)}
+.ig input::placeholder{color:var(--dim);opacity:.6}
+.cmd{margin-top:16px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.cmdt{font-family:'SF Mono',Monaco,monospace;font-size:1.05rem;color:var(--ok);word-break:break-all}
+.cpb{background:var(--accent);color:var(--text);border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.85rem;white-space:nowrap;transition:all .2s}
+.cpb:hover{background:var(--hi)}.cpb:active{transform:scale(.95)}
+.psg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.psb{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;text-align:left;transition:all .2s;color:var(--text)}
+.psb:hover{border-color:var(--hi);background:rgba(233,69,96,.08);transform:translateY(-1px)}
+.psn{font-family:monospace;font-size:1.1rem;font-weight:700;color:var(--hi)}
+.pss{font-family:monospace;font-size:.8rem;color:var(--dim);margin-top:2px}
+.psd{font-size:.78rem;color:var(--dim);margin-top:4px}
+.bd{margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bdi{background:rgba(255,255,255,.03);border-radius:8px;padding:10px 12px;text-align:center}
+.bdl{font-size:.72rem;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+.bdv{font-family:monospace;font-size:1.3rem;font-weight:700;margin-top:2px}
+.bds{font-family:monospace;font-size:.85rem;color:var(--dim);margin-top:2px}
+.oc{color:#ff6b6b}.gc{color:#ffd93d}.tc{color:#6bcb77}
+footer{text-align:center;color:var(--dim);font-size:.78rem;margin-top:30px;padding-bottom:20px}
+footer a{color:var(--hi);text-decoration:none}
+@media(max-width:500px){.card{padding:16px}h1{font-size:1.4rem}.pg{grid-template-columns:60px repeat(3,1fr)}.cb,.cw{width:38px;height:38px}.cb{font-size:1rem}.ir{flex-direction:column}.psg{grid-template-columns:1fr}.bd{grid-template-columns:1fr}.cmd{flex-direction:column;align-items:stretch;text-align:center}}
 </style>
 </head>
 <body>
-<div class="container">
-<header><h1>&#128274; Chmod Calculator</h1><p>Visual Linux file permission calculator</p></header>
+<div class="ctn">
+<h1>&#128274; Unix Chmod Calculator</h1>
+<p class="sub">Numeric &#8596; Symbolic mode conversion &middot; Visual permission editor</p>
 
 <div class="card">
-<h2>&#9000;&#65039; Enter Permission</h2>
-<div class="ni">
-<label>Numeric:</label>
-<input type="text" id="numIn" maxlength="3" placeholder="755" value="755">
-<label>Symbolic:</label>
-<input type="text" id="symIn" maxlength="9" placeholder="rwxr-xr-x" value="rwxr-xr-x" style="width:130px">
+<div class="ct"><em>&#9989;</em> Permission Settings</div>
+<div class="pg">
+<div></div><div class="ph">Read (r)</div><div class="ph">Write (w)</div><div class="ph">Execute (x)</div>
+<div class="pl">Owner</div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="0" data-b="4" aria-label="Owner Read"><div class="cb">r</div></label></div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="0" data-b="2" aria-label="Owner Write"><div class="cb">w</div></label></div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="0" data-b="1" aria-label="Owner Execute"><div class="cb">x</div></label></div>
+<div class="pl">Group</div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="1" data-b="4" aria-label="Group Read"><div class="cb">r</div></label></div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="1" data-b="2" aria-label="Group Write"><div class="cb">w</div></label></div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="1" data-b="1" aria-label="Group Execute"><div class="cb">x</div></label></div>
+<div class="pl">Others</div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="2" data-b="4" aria-label="Others Read"><div class="cb">r</div></label></div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="2" data-b="2" aria-label="Others Write"><div class="cb">w</div></label></div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="2" data-b="1" aria-label="Others Execute"><div class="cb">x</div></label></div>
+</div>
+<div class="bd">
+<div class="bdi"><div class="bdl">Owner</div><div class="bdv oc" id="ov">7</div><div class="bds" id="os">rwx</div></div>
+<div class="bdi"><div class="bdl">Group</div><div class="bdv gc" id="gv">5</div><div class="bds" id="gs">r-x</div></div>
+<div class="bdi"><div class="bdl">Others</div><div class="bdv tc" id="tv">5</div><div class="bds" id="ts">r-x</div></div>
 </div>
 </div>
 
 <div class="card">
-<h2>&#9745;&#65039; Permission Matrix</h2>
-<table class="m">
-<thead><tr><th></th><th>Read (4)</th><th>Write (2)</th><th>Execute (1)</th></tr></thead>
-<tbody>
-<tr><td>Owner</td><td><input type="checkbox" data-who="o" data-perm="r"></td><td><input type="checkbox" data-who="o" data-perm="w"></td><td><input type="checkbox" data-who="o" data-perm="x"></td></tr>
-<tr><td>Group</td><td><input type="checkbox" data-who="g" data-perm="r"></td><td><input type="checkbox" data-who="g" data-perm="w"></td><td><input type="checkbox" data-who="g" data-perm="x"></td></tr>
-<tr><td>Others</td><td><input type="checkbox" data-who="t" data-perm="r"></td><td><input type="checkbox" data-who="t" data-perm="w"></td><td><input type="checkbox" data-who="t" data-perm="x"></td></tr>
-</tbody>
-</table>
-</div>
-
-<div class="card">
-<h2>&#128200; Result</h2>
-<div class="og">
-<div class="ob"><label>Numeric</label><div class="v" id="outNum">755</div></div>
-<div class="ob"><label>Symbolic</label><div class="v" id="outSym">rwxr-xr-x</div></div>
-<div class="ob"><label>Octal</label><div class="v" id="outOct">0755</div></div>
+<div class="ct"><em>&#128259;</em> Mode Conversion</div>
+<div class="ir">
+<div class="ig"><label>Numeric Mode</label><input type="text" id="numIn" placeholder="e.g. 755" maxlength="3"></div>
+<div class="ig"><label>Symbolic Mode</label><input type="text" id="symIn" placeholder="e.g. rwxr-xr-x" maxlength="9"></div>
+<div class="ig"><label>Filename</label><input type="text" id="fnIn" placeholder="e.g. script.sh" value="filename"></div>
 </div>
 <div class="cmd">
-<code id="cmdOut">chmod 755 filename</code>
-<input type="text" id="fnInput" placeholder="filename" value="filename">
-<button class="btn" onclick="copyCmd()">Copy</button>
+<code class="cmdt" id="cmdOut">chmod 755 filename</code>
+<button class="cpb" id="cpBtn" aria-label="Copy command">Copy</button>
 </div>
 </div>
 
 <div class="card">
-<h2>&#9889; Common Presets</h2>
-<div class="presets">
-<button class="pb" onclick="setPreset(777)">777<small>Full access</small></button>
-<button class="pb" onclick="setPreset(755)">755<small>Standard dir</small></button>
-<button class="pb" onclick="setPreset(750)">750<small>Group access</small></button>
-<button class="pb" onclick="setPreset(644)">644<small>Standard file</small></button>
-<button class="pb" onclick="setPreset(600)">600<small>Private file</small></button>
-<button class="pb" onclick="setPreset(400)">400<small>Read-only</small></button>
-<button class="pb" onclick="setPreset(700)">700<small>Private dir</small></button>
-<button class="pb" onclick="setPreset(666)">666<small>All rw</small></button>
-</div>
+<div class="ct"><em>&#9889;</em> Common Presets</div>
+<div class="psg" id="presets"></div>
 </div>
 
-<div class="card">
-<h2>&#128218; Permission Reference</h2>
-<table class="r">
-<thead><tr><th>Number</th><th>Symbol</th><th>Permission</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><code>4</code></td><td><code>r</code></td><td>Read</td><td>View file contents / list directory</td></tr>
-<tr><td><code>2</code></td><td><code>w</code></td><td>Write</td><td>Modify file / add/delete in directory</td></tr>
-<tr><td><code>1</code></td><td><code>x</code></td><td>Execute</td><td>Run file / access directory</td></tr>
-<tr><td><code>0</code></td><td><code>-</code></td><td>None</td><td>No permission</td></tr>
-</tbody>
-</table>
-<table class="r" style="margin-top:16px">
-<thead><tr><th>Position</th><th>Meaning</th><th>Example</th></tr></thead>
-<tbody>
-<tr><td>1st digit</td><td>Owner (user)</td><td><code>7</code> = rwx</td></tr>
-<tr><td>2nd digit</td><td>Group</td><td><code>5</code> = r-x</td></tr>
-<tr><td>3rd digit</td><td>Others</td><td><code>5</code> = r-x</td></tr>
-</tbody>
-</table>
+<footer>Unix Chmod Calculator &middot; <a href="https://github.com/Lifa-su/ai-chmod-calculator" target="_blank" rel="noopener">GitHub</a></footer>
 </div>
-
-<footer>AI Chmod Calculator &mdash; Built for developers</footer>
-</div>
-
 <script>
-const checks = document.querySelectorAll('input[type=checkbox]');
-const numIn = document.getElementById('numIn');
-const symIn = document.getElementById('symIn');
-const outNum = document.getElementById('outNum');
-const outSym = document.getElementById('outSym');
-const outOct = document.getElementById('outOct');
-const cmdOut = document.getElementById('cmdOut');
-const fnInput = document.getElementById('fnInput');
-
-const whoMap = {o:0, g:1, t:2};
-const permMap = {r:4, w:2, x:1};
-
-function getPermsFromCheckboxes() {
-  let p = [0,0,0];
-  checks.forEach(cb => {
-    if (cb.checked) p[whoMap[cb.dataset.who]] += permMap[cb.dataset.perm];
-  });
-  return p;
+(function(){
+const cbs=document.querySelectorAll('.cw input');
+const numIn=document.getElementById('numIn');
+const symIn=document.getElementById('symIn');
+const fnIn=document.getElementById('fnIn');
+const cmdOut=document.getElementById('cmdOut');
+const cpBtn=document.getElementById('cpBtn');
+const presetsEl=document.getElementById('presets');
+let perms=[7,5,5];
+const PRESETS=[
+{n:'777',d:'Full access for everyone (risky)'},
+{n:'755',d:'Owner full, others read+execute'},
+{n:'750',d:'Owner full, group read+execute'},
+{n:'700',d:'Owner full, others none'},
+{n:'644',d:'Owner read+write, others read only'},
+{n:'640',d:'Owner rw, group read, others none'},
+{n:'600',d:'Owner read+write only'},
+{n:'400',d:'Owner read only'},
+{n:'444',d:'Read only for everyone'},
+{n:'555',d:'Read+execute for everyone'},
+{n:'775',d:'Owner+group full, others read+exec'},
+{n:'664',d:'Owner+group rw, others read'}
+];
+function numToSym(n){
+let s='';
+for(let i=0;i<3;i++){
+s+=(n[i]&4)?'r':'-';
+s+=(n[i]&2)?'w':'-';
+s+=(n[i]&1)?'x':'-';
 }
-
-function numToSym(n) {
-  let s = '';
-  for (let i = 0; i < 3; i++) {
-    let d = parseInt(String(n).charAt(i)) || 0;
-    s += (d & 4) ? 'r' : '-';
-    s += (d & 2) ? 'w' : '-';
-    s += (d & 1) ? 'x' : '-';
-  }
-  return s;
+return s;
 }
-
-function symToNum(s) {
-  if (s.length !== 9) return null;
-  let n = '';
-  for (let i = 0; i < 3; i++) {
-    let v = 0;
-    v += s[i*3] === 'r' ? 4 : 0;
-    v += s[i*3+1] === 'w' ? 2 : 0;
-    v += s[i*3+2] === 'x' ? 1 : 0;
-    n += v;
-  }
-  return n;
+function symToNum(s){
+if(s.length!==9)return null;
+let r=[];
+for(let i=0;i<3;i++){
+let v=0;
+let o=i*3;
+if(s[o]==='r')v+=4;else if(s[o]!=='-')return null;
+if(s[o+1]==='w')v+=2;else if(s[o+1]!=='-')return null;
+if(s[o+2]==='x')v+=1;else if(s[o+2]!=='-')return null;
+r.push(v);
 }
-
-function updateFromCheckboxes() {
-  let p = getPermsFromCheckboxes();
-  let num = '' + p[0] + p[1] + p[2];
-  let sym = numToSym(num);
-  numIn.value = num;
-  symIn.value = sym;
-  updateOutput(num, sym);
+return r;
 }
-
-function updateOutput(num, sym) {
-  outNum.textContent = num;
-  outSym.textContent = sym;
-  outOct.textContent = '0' + num;
-  cmdOut.textContent = 'chmod ' + num + ' ' + (fnInput.value || 'filename');
-  updatePresetHighlight(num);
-}
-
-function setCheckboxes(num) {
-  let s = String(num).padStart(3, '0');
-  checks.forEach(cb => {
-    let idx = whoMap[cb.dataset.who];
-    let d = parseInt(s.charAt(idx)) || 0;
-    let pv = permMap[cb.dataset.perm];
-    cb.checked = (d & pv) !== 0;
-  });
-}
-
-function updatePresetHighlight(num) {
-  document.querySelectorAll('.pb').forEach(b => {
-    b.classList.toggle('active', b.textContent.startsWith(num));
-  });
-}
-
-checks.forEach(cb => cb.addEventListener('change', updateFromCheckboxes));
-
-numIn.addEventListener('input', function() {
-  let v = this.value.replace(/[^0-7]/g, '').slice(0, 3);
-  this.value = v;
-  if (v.length === 3) {
-    let sym = numToSym(v);
-    symIn.value = sym;
-    setCheckboxes(v);
-    updateOutput(v, sym);
-  }
+function updateUI(source){
+let sym=numToSym(perms);
+let numStr=perms.join('');
+if(source!=='num')numIn.value=numStr;
+if(source!=='sym')symIn.value=sym;
+cbs.forEach(function(cb){
+let w=parseInt(cb.dataset.w);
+let b=parseInt(cb.dataset.b);
+cb.checked=(perms[w]&b)!==0;
 });
-
-symIn.addEventListener('input', function() {
-  let v = this.value.replace(/[^rwx-]/g, '').slice(0, 9);
-  this.value = v;
-  if (v.length === 9) {
-    let num = symToNum(v);
-    if (num) {
-      numIn.value = num;
-      setCheckboxes(num);
-      updateOutput(num, v);
-    }
-  }
-});
-
-fnInput.addEventListener('input', function() {
-  cmdOut.textContent = 'chmod ' + numIn.value + ' ' + (this.value || 'filename');
-});
-
-function setPreset(n) {
-  let s = String(n);
-  numIn.value = s;
-  symIn.value = numToSym(s);
-  setCheckboxes(s);
-  updateOutput(s, numToSym(s));
+document.getElementById('ov').textContent=perms[0];
+document.getElementById('os').textContent=sym.substring(0,3);
+document.getElementById('gv').textContent=perms[1];
+document.getElementById('gs').textContent=sym.substring(3,6);
+document.getElementById('tv').textContent=perms[2];
+document.getElementById('ts').textContent=sym.substring(6,9);
+let fn=fnIn.value.trim()||'filename';
+cmdOut.textContent='chmod '+numStr+' '+fn;
 }
-
-function copyCmd() {
-  let btn = document.querySelector('.cmd .btn');
-  navigator.clipboard.writeText(cmdOut.textContent).then(() => {
-    btn.textContent = 'Copied!';
-    btn.style.background = 'var(--green)';
-    setTimeout(() => { btn.textContent = 'Copy'; btn.style.background = ''; }, 1500);
-  });
+cbs.forEach(function(cb){
+cb.addEventListener('change',function(){
+let w=parseInt(this.dataset.w);
+let b=parseInt(this.dataset.b);
+if(this.checked)perms[w]|=b;
+else perms[w]&=~b;
+updateUI('cb');
+});
+});
+numIn.addEventListener('input',function(){
+let v=this.value.replace(/[^0-7]/g,'');
+if(v.length>3)v=v.substring(0,3);
+this.value=v;
+if(v.length===3){
+perms=[parseInt(v[0]),parseInt(v[1]),parseInt(v[2])];
+updateUI('num');
 }
-
-// Init
-setCheckboxes('755');
+});
+symIn.addEventListener('input',function(){
+let v=this.value.toLowerCase();
+if(v.length===9){
+let r=symToNum(v);
+if(r){perms=r;updateUI('sym');}
+}
+});
+fnIn.addEventListener('input',function(){updateUI('fn');});
+cpBtn.addEventListener('click',function(){
+navigator.clipboard.writeText(cmdOut.textContent).then(function(){
+cpBtn.textContent='Copied!';
+setTimeout(function(){cpBtn.textContent='Copy';},1500);
+});
+});
+PRESETS.forEach(function(p){
+let btn=document.createElement('button');
+btn.className='psb';
+btn.setAttribute('aria-label','Set permission to '+p.n);
+btn.innerHTML='<div class="psn">'+p.n+'</div><div class="pss">'+numToSym([parseInt(p.n[0]),parseInt(p.n[1]),parseInt(p.n[2])])+'</div><div class="psd">'+p.d+'</div>';
+btn.addEventListener('click',function(){
+perms=[parseInt(p.n[0]),parseInt(p.n[1]),parseInt(p.n[2])];
+updateUI('preset');
+});
+presetsEl.appendChild(btn);
+});
+updateUI('init');
+})();
 </script>
-<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
 </body>
 </html>
